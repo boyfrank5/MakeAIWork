@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import random
+import random as ra
 from random import randint
 
 # ASSIGNMENT
