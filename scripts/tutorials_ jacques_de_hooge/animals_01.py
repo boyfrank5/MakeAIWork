@@ -34,19 +34,19 @@ def init (dog, sound, kind = None, name = 'naamloos'):
 
 def eat (dog, food = 'Wat de pot schaft'):
     _introduce (dog)
-    print (f' en ik eet {food}' )
+    print (f'en ik eet {food}' )
     
 def move (dog):
     _introduce (dog)
-    print (f' en ik loop' )
+    print (f'en ik loop' )
     
 def reproduce (dog, aantal = 3):
     _introduce (dog)
-    print (f' en ik krijg gemiddeld {aantal} jongen' )
+    print (f'en ik krijg gemiddeld {aantal} jongen' )
     
 def wagTail (dog):
     _introduce (dog)
-    print (' en ik kwispel' )
+    print ('en ik kwispel' )
     
 def _introduce (dog):
     print (
@@ -57,8 +57,8 @@ def _introduce (dog):
 def _getSpecies (dog):
     return dog.kind 
   
-init (myDog, 'Wraff', 'Ritriever', 'Bello')
-init (yourDog, 'Kef', 'Poodle', 'Nouchka')
+init (myDog, 'Wraff', 'Ritriever ', 'Bello')
+init (yourDog, 'Kef', 'Poodle ', 'Nouchka')
 
 eat (myDog, 'blikvoer')
 wagTail (myDog)

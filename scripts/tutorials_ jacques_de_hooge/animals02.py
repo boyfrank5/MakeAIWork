@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 class Dog:
   def __init__ (self, sound, kind = None, name = 'naamloos'):
@@ -24,7 +25,7 @@ class Dog:
       
   def _introduce (self):
       print (
-        f'Hallo, ik ben {self.name}, mijn soort is {_getSpecies (dog)}',
+        f'Hallo, ik ben {self.name}, mijn soort is {_getSpecies (self)}',
         end =''      
       )
       
@@ -35,12 +36,12 @@ class Dog:
 myDog = Dog ('Wraff', 'Ritriever', 'Bello')
 yourDog = Dog ('Kef', 'Poodle', 'Nouchka')
 
-eat (myDog, 'blikvoer')
-wagTail (myDog)
-eat (yourDog, 'droogvoer') 
-reproduce (myDog, 4)
-move (yourDog)
-reproduce (yourDog, 5) 
-move (myDog)
-wagTail (yourDog)
+myDog.eat ('blikvoer')
+myDog.wagTail ()
+yourDog.eat ('droogvoer') 
+myDog.reproduce (4)
+yourDog.move
+yourDog.reproduce (5) 
+myDog.move
+yourDog.wagTail
    
