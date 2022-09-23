@@ -1,0 +1,14 @@
+rectangle heeft:
+  init(self, width, height)
+
+  Stap1: teken een UML ClassDiagram 
+
+Stap2: definieer class Rectangle in rectangle.py
+
+Stap3: maak een Ractangle object aan in testRectagnle.py
+
+Stap4: pas class Rectangle aan totdat testRectangle werkt
+
+Stap5: roep vanuit restRectangle.py methode area() van je object aan.
+
+Stap6:
