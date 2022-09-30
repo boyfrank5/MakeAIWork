@@ -24,42 +24,46 @@ It is meant for training purposes only.
 
 Removing this header ends your license.
 '''
+#!/usr/bin/env python
 
-import time as tm           # Wordt gebruikt om een pauze in te lassen
-import traceback as tb          # wordt niet gebruikt
-import math as mt           # wordt niet gebruikt
+import time as tm
+import traceback as tb
+import math as mt
 import sys as ss
 import os
 import socket as sc
+import numpy as np
+import tensorflow as tf
 
-ss.path +=  [os.path.abspath (relPath) for relPath in  ('..',)]         # Voegt zoekpaden toe
+
+ss.path +=  [os.path.abspath (relPath) for relPath in  ('..',)] 
 
 import socket_wrapper as sw
 import parameters as pm
 
-class HardcodedClient:          # Wordt helemaal onderaan aangeroepen
+class HardcodedClient:
     def __init__ (self):
         self.steeringAngle = 0
 
-        with open (pm.sampleFileName, 'w') as self.sampleFile:          # Opent file met schrijfrechten
-            with sc.socket (*sw.socketType) as self.clientSocket:           # Socketwrapper maakt connectie tussen wereld en auto
+        with open (pm.sampleFileName, 'w') as self.sampleFile:
+            with sc.socket (*sw.socketType) as self.clientSocket:
                 self.clientSocket.connect (sw.address)
                 self.socketWrapper = sw.SocketWrapper (self.clientSocket)
-                self.halfApertureAngle = False          # Roep je vast aan, maar wordt nog niet gebruikt
+                self.halfApertureAngle = False
 
-                while True:         # Programma blijft draaien totdat niet meer aan de voorwaarden wordt voldaan (bv stoppen van het programma)
+                while True:
                     self.input ()
-                    self.sweep ()           # We zeggen hier nog niet lidar of sonar
+                    self.sweep ()
                     self.output ()
                     self.logTraining ()
-                    tm.sleep (0.02)         # Om de zoveel tijd krijgt ie nieuwe stuurhoek en snelheid
+                    tm.sleep (0.02)
 
-    def input (self):           # Dit doet voornamelijk data ontvangen.kan dus ook gelijk blijven als we met neural network aan de slag gaan.
-        sensors = self.socketWrapper.recv ()            # Dus, waar ben ik in de wereld en stop die info in de sensoren. Tip: zet hier breakpoint, zodat je kan zien wat er in sensors zit
+    def input (self):
+        sensors = self.socketWrapper.recv ()
 
-        if not self.halfApertureAngle:          # We beginnen op false, zodat we altijd deze loop in gaan
+        if not self.halfApertureAngle:
             self.halfApertureAngle = sensors ['halfApertureAngle']
-            self.sectorAngle = 2 * self.halfApertureAngle / pm.lidarInputDim           
+            self.sectorAngle = 2 * self.halfApertureAngle / pm.lidarInputDim
             self.halfMiddleApertureAngle = sensors ['halfMiddleApertureAngle']
             
         if 'lidarDistances' in sensors:
@@ -67,31 +71,31 @@ class HardcodedClient:          # Wordt helemaal onderaan aangeroepen
         else:
             self.sonarDistances = sensors ['sonarDistances']
 
-    def lidarSweep (self):          # We kijken in dit stukje code steeds naar 2 pionnen. Dit stukje van de code is hetgeen gaan herschrijven.
-        nearestObstacleDistance = pm.finity         # Hier zetten we die op 20, dus hij ziet pionnen tot 20m
+    def lidarSweep (self):
+        nearestObstacleDistance = pm.finity
         nearestObstacleAngle = 0
         
         nextObstacleDistance = pm.finity
         nextObstacleAngle = 0
 
-        for lidarAngle in range (-self.halfApertureAngle, self.halfApertureAngle):          # We gaan hier van links naar rechts door de sectroren van de aperture, graad voor graad (dus die 16 sectoren is ergens anders voor)
-            lidarDistance = self.lidarDistances [lidarAngle]            # Voor elke lidar angle hebben we een distance (=de afstand tot pylon voor deze specifieke hoek)
+        for lidarAngle in range (-self.halfApertureAngle, self.halfApertureAngle):
+            lidarDistance = self.lidarDistances [lidarAngle]
             
-            if lidarDistance < nearestObstacleDistance:         # Als hier blijkt dat de afstand kleiner is dan 20, dan is dit dus interessant
-                nextObstacleDistance =  nearestObstacleDistance         # We hebben er hierboven 1 gevonden dan we hadden, en dus maken we de dichtsbijzijnde nu de op 1 na dichtsbijzijnde. Dit is nog steeds belangrijke info die we dus willen bewaren
+            if lidarDistance < nearestObstacleDistance:
+                nextObstacleDistance =  nearestObstacleDistance
                 nextObstacleAngle = nearestObstacleAngle
                 
                 nearestObstacleDistance = lidarDistance 
                 nearestObstacleAngle = lidarAngle
 
-            elif lidarDistance < nextObstacleDistance:          # Hier wordt nog gekeken naar de op een na dichtsbijzijnde pylon.
+            elif lidarDistance < nextObstacleDistance:
                 nextObstacleDistance = lidarDistance
                 nextObstacleAngle = lidarAngle
            
-        targetObstacleDistance = (nearestObstacleDistance + nextObstacleDistance) / 2           # Ik weet de hoek tussen beide pylonnen, en ga daar midden tussendoor rijden
+        targetObstacleDistance = (nearestObstacleDistance + nextObstacleDistance) / 2
 
-        self.steeringAngle = (nearestObstacleAngle + nextObstacleAngle) / 2         # Wordt bepaald door 2 pillonnen
-        self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)         # Bepaald snelheid op basis van stuurhoek
+        self.steeringAngle = (nearestObstacleAngle + nextObstacleAngle) / 2
+        self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
     def sonarSweep (self):
         obstacleDistances = [pm.finity for sectorIndex in range (3)]
@@ -119,12 +123,12 @@ class HardcodedClient:          # Wordt helemaal onderaan aangeroepen
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
     def sweep (self):
-        if hasattr (self, 'lidarDistances'):            # Afhankelijk van de aangeboden data, wordt hier bepaald of we lidar of sonar gaan gebruiken
+        if hasattr (self, 'lidarDistances'):
             self.lidarSweep ()
         else:
             self.sonarSweep ()
 
-    def output (self):          # Hier gaan we ahv berekeingen gegevens terugsturen naar auto (via socketwrapper). deze functie komt precies zo in mijn eigen programma
+    def output (self):
         actuators = {
             'steeringAngle': self.steeringAngle,
             'targetVelocity': self.targetVelocity
@@ -132,7 +136,7 @@ class HardcodedClient:          # Wordt helemaal onderaan aangeroepen
 
         self.socketWrapper.send (actuators)
 
-    def logLidarTraining (self):            # logt je data in de defaul.sample
+    def logLidarTraining (self):
         sample = [pm.finity for entryIndex in range (pm.lidarInputDim + 1)]
 
         for lidarAngle in range (-self.halfApertureAngle, self.halfApertureAngle):
@@ -142,7 +146,7 @@ class HardcodedClient:          # Wordt helemaal onderaan aangeroepen
         sample [-1] = self.steeringAngle
         print (*sample, file = self.sampleFile)
 
-    def logSonarTraining (self):            # logt je data in de defaul.sample
+    def logSonarTraining (self):
         sample = [pm.finity for entryIndex in range (pm.sonarInputDim + 1)]
 
         for entryIndex, sectorIndex in ((2, -1), (0, 0), (1, 1)):
@@ -157,4 +161,10 @@ class HardcodedClient:          # Wordt helemaal onderaan aangeroepen
         else:
             self.logSonarTraining ()
 
+
+
+
+
+
 HardcodedClient ()
+

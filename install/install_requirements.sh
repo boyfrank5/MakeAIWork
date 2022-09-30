@@ -58,8 +58,7 @@ function install_with_pip {
   # Install setuptools
   python3 -m pip install setuptools
   python3 -m pip install --no-cache-dir -r install/pip/requirements.txt
-
 }
 
-#install_with_conda
+install_with_conda
 install_with_pip 
