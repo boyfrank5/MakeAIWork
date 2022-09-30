@@ -21,3 +21,12 @@ simpylc/conda/Miniconda3-latest-MacOSX-arm64.sh
 simpylc/conda/Miniconda3-latest-MacOSX-x86_64.sh
 simpylc/conda/Miniconda3-latest-Windows-x86_64.exe
 simpylc/pip/requirements.txt
+install/
+notebooks/numpy/pics/
+simulations/arduino_led_timer
+simulations/arduino_traffic_lights
+simulations/blinking_light
+simulations/one_armed_robot
+simulations/pid_controller
+simulations/rocket
+simulations/train
