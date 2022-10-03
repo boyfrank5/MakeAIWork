@@ -35,8 +35,8 @@ import socket as sc
 import numpy as np
 import tensorflow as tf
 
-sonar_model_path = '/Users/boyfrankclaesen/MakeAIWork/simulations/car/control_client/trainedModel'
-lidar_model_path = '/Users/boyfrankclaesen/MakeAIWork/simulations/car/control_client/lidar_trained_model'
+sonar_model_path = '/Users/boyfrankclaesen/MakeAIWork/simulations/car/control_client/s_ts_model'
+lidar_model_path = '/Users/boyfrankclaesen/MakeAIWork/simulations/car/control_client/l_ts_model'
 
 ss.path +=  [os.path.abspath (relPath) for relPath in  ('..',)] 
 
@@ -44,7 +44,7 @@ import socket_wrapper as sw
 import parameters as pm
 
 class DrivingAgent:
-    def __init__ (self):
+    def __init__ (self): # hier wordt het object gemaakt. Alle def functies die onder de class hangen gaan meee. 
         self.model = None
         self.steeringAngle = 0
 
@@ -55,13 +55,13 @@ class DrivingAgent:
                 self.halfApertureAngle = False
 
                 while True:
-                    self.input ()
-                    self.sweep ()
-                    self.output ()
+                    self.input () # komt vanuit de simulatie
+                    self.sweep () # hier wordt het NN toegepast
+                    self.output () # hier wordt de output gestuurd naar de output -> stuurhoek en snelheid.
                     #self.logTraining ()
                     tm.sleep (0.02)
 
-    def input (self):
+    def input (self): #de input komt niet vanzelf binnen, deze wordt dmv deze def opgeroepen.
         sensors = self.socketWrapper.recv ()
 
         if not self.halfApertureAngle:
@@ -72,12 +72,13 @@ class DrivingAgent:
         if 'lidarDistances' in sensors:
             self.lidarDistances = sensors ['lidarDistances']
             if self.model == None:
-                self.model = tf.keras.models.load_model(lidar_model_path)
+                self.model = tf.keras.models.load_model(lidar_model_path) # probeer hier later nog eens naar te kijken. OOP gerelateerd.
         else:
             self.sonarDistances = sensors ['sonarDistances']
             if self.model == None:
-                self.model = tf.keras.models.load_model(sonar_model_path)
-                
+                self.model = tf.keras.models.load_model(sonar_model_path) #naam aanpassen
+
+#lidar             
     def lidarSweep (self):
         nearestObstacleDistance = pm.finity
         nearestObstacleAngle = 0
@@ -104,16 +105,15 @@ class DrivingAgent:
         self.steeringAngle = (nearestObstacleAngle + nextObstacleAngle) / 2
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
-
-# hardcoded_client:
+#sonar
     def sonarSweep (self):
-        new_model = self.model.predict(np.array([self.sonarDistances]))
+        new_model = self.model.predict(np.array([self.sonarDistances])) # drie waarde voor sonar, worden gehaald uit SR
         self.steeringAngle = float(new_model[0][0]) 
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
 
     def sweep (self):
-        if hasattr (self, 'lidarDistances'):
+        if hasattr (self, 'lidarDistances'): # wordt gecreerd in de input. #73
             self.lidarSweep ()
         else:
             self.sonarSweep ()
