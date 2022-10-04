@@ -10,7 +10,6 @@ sonar_steeringAngle = np.loadtxt(filename, dtype=float, max_rows= 1000, usecols=
 sonar_data_val = sonar_data[500:800]
 sonar_steeringAngle_val = sonar_steeringAngle[500:800]
 
-#bouw lagen model
 model = tf.keras.Sequential([
   tf.keras.Input(shape=(3,)),
   tf.keras.layers.Dense(16, activation='relu'),
