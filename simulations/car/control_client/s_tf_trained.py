@@ -59,3 +59,5 @@ model.compile(optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001),
 #model.save('/Users/boyfrankclaesen/MakeAIWork/simulations/car/control_client/s_tf_model')
 #predictions = new_model.predict([sonar_data])
 
+#push test
+
