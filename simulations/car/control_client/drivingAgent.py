@@ -35,8 +35,7 @@ import socket as sc
 import numpy as np
 import tensorflow as tf
 
-# sonar_model_path = '/Users/boyfrankclaesen/MakeAIWork/simulations/car/control_client/s_tf_model'
-# lidar_model_path = r'simulations/car/control_client/l_tf_model'
+
 sonar_model_path = r'./s_tf_model'
 lidar_model_path = r'./l_tf_model'
 
@@ -46,7 +45,7 @@ import socket_wrapper as sw
 import parameters as pm
 
 class DrivingAgent: # Alle 'self.' die onder deze class staan slaan op DrivingAgent. 
-    def __init__ (self): # hier wordt het object gemaakt. Alle def functies die onder de class hangen gaan meee. 
+    def __init__ (self): # Hier wordt het object gemaakt. Alle def functies die onder de class hangen gaan meee. 
         self.model = None
         self.steeringAngle = 0
 
